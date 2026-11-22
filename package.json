@@ -1,0 +1,56 @@
+{
+  "name": "opencode-feishu-cards",
+  "version": "1.0.0",
+  "description": "OpenCode V2 plugin that sends Feishu (Lark) card notifications when a session completes, fails, or needs you",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./tui": "./tui.tsx"
+  },
+  "files": [
+    "index.ts",
+    "config.ts",
+    "events.ts",
+    "feishu.ts",
+    "format.ts",
+    "notify.ts",
+    "paths.ts",
+    "state.ts",
+    "tui.tsx",
+    "version.ts",
+    "CHANGELOG.md"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "feishu",
+    "lark",
+    "notification"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "bun test",
+    "test-send": "bun run test-send.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "tsc --noEmit && bun test"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.3.2"
+  },
+  "devDependencies": {
+    "@opentui/core": "0.9.7",
+    "@opentui/solid": "0.9.7",
+    "@types/bun": "^1.3.14",
+    "@types/node": "^24.0.0",
+    "solid-js": "1.9.20",
+    "typescript": "^5.9.0"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.8.4",
+    "@opentui/solid": ">=0.8.4",
+    "solid-js": "^1.9.12"
+  }
+}
