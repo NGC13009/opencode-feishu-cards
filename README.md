@@ -38,18 +38,33 @@
 ### 2. 安装插件
 
 ```powershell
-opencode plugin add opencode-feishu-cards@^1.0.0
+opencode plugin add opencode-feishu-cards@1.0.0
 ```
 
-`opencode plugin add` 会把包写入全局配置，但它只写入不带凭证的条目。打开 `~/.config/opencode/opencode.json(c)`，把新增的条目改写成对象形式并填入凭证：
+这条命令会把插件安装到 OpenCode 的插件目录，并在全局配置 `~/.config/opencode/opencode.json(c)` 的 `plugins` 数组里追加一条条目。Windows 下这个文件通常是：
+
+```text
+C:\Users\<用户名>\.config\opencode\opencode.jsonc
+```
+
+CLI 写入的是不带版本、也不带凭证的裸包名。裸包名会停留在安装时的版本，需要升级时执行：
+
+```powershell
+opencode plugin update opencode-feishu-cards
+```
+
+### 3. 填写凭证
+
+打开上一步的全局配置，把新增的 `"opencode-feishu-cards"` 字符串条目改写成对象形式，填入飞书应用信息：
 
 ```jsonc
 {
   "plugins": [
+    // 其他插件条目……
     {
       "package": "opencode-feishu-cards",
       "options": {
-        "appId": "cli_xxx",
+        "appId": "cli_xxxxxxxxxxxx",
         "appSecret": "${FEISHU_APP_SECRET}",
         "receiverId": "you@company.com",
         "receiverType": "email"
@@ -59,15 +74,42 @@ opencode plugin add opencode-feishu-cards@^1.0.0
 }
 ```
 
-也可以跳过 CLI，直接把上面的对象条目写进全局或项目的 `opencode.json(c)`。
+- `appId`：飞书开放平台 → 你的应用 →「凭证与基础信息」中的 App ID。
+- `appSecret`：同一页面的 App Secret。推荐用 `${环境变量名}` 引用，而不是直接写明文。
+- `receiverId`：接收消息的人或群，规则见下方「接收者 ID」。
+- `receiverType`：可省略，插件会按 `receiverId` 自动推断。
+- `minDurationSeconds`、`summaryChars`、`baseUrl` 为可选项，见「配置项」。
 
-`@^1.0.0` 形式的字符串条目会跟随次版本自动更新；改成对象形式后包名不再带范围，需要更新时执行 `opencode plugin update`。
+`appId`、`appSecret`、`receiverId` 三项缺一不可，缺少时插件会在日志中说明原因并停用。
 
-也可以支持`open_id`，`user_id`等方式调用（记得在飞书开发后台开放权限）。
+#### 用环境变量保存 App Secret
 
-#### 本地目录安装
+`appSecret`（以及其他字符串选项）支持 `${ENV_NAME}` 形式的环境变量引用。设置方式二选一：
 
-修改源码或离线使用时，可以直接引用本仓库目录：
+```powershell
+# 只在当前 PowerShell 会话有效
+$env:FEISHU_APP_SECRET = "你的 App Secret"
+
+# 写入当前用户的环境变量，之后启动的进程都能读到
+setx FEISHU_APP_SECRET "你的 App Secret"
+```
+
+`setx` 写入后需要重新启动 OpenCode，新进程才会继承这个变量。用 `$env:` 临时设置时，也要从同一个 PowerShell 会话启动 OpenCode。
+
+也可以直接写字符串，但不要把含真实密钥的配置提交到 Git。
+
+#### 确认配置生效
+
+1. 打开 TUI，会话侧栏应出现「飞书通知：开」。
+2. 输入 `/feishu`，应显示当前版本和开关状态。
+3. 让一个会话正常结束，手机上的飞书应收到完成卡片。
+4. 没有反应时，在 `~/.local/share/opencode/log/opencode.log` 中搜索 `[feishu-notify]`，缺少选项、环境变量未设置等问题都会在这里说明。
+
+配置变更会被 OpenCode 自动加载，不需要重启；只有环境变量和插件包本身的变化需要重启。
+
+### 4. 本地目录安装（开发或离线）
+
+修改源码或无法访问 npm 时，可以直接引用本仓库目录：
 
 ```jsonc
 {
@@ -124,9 +166,7 @@ opencode.jsonc:
 
 本地目录方式运行时不需要 `node_modules`，它只用于开发和测试。`package.json` 必须随插件一起复制：插件版本从它的 `version` 字段读取。从 npm 安装时由 OpenCode 自动安装依赖。
 
-`appSecret` 支持 `${ENV_NAME}` 形式的环境变量引用。也可以直接写字符串，但不要把包含真实密钥的配置提交到仓库。
-
-OpenCode 会自动加载配置变更。修改插件源码后，执行 `opencode service restart` 重新加载。
+修改插件源码后，执行 `opencode service restart` 重新加载。
 
 ## 配置项
 
@@ -141,6 +181,8 @@ OpenCode 会自动加载配置变更。修改插件源码后，执行 `opencode 
 | `summaryChars` | number | `0` | 完成通知正文的最大字符数，`0` 表示不限制，最大可设为 `5000` |
 
 事件类型由独立的 `feishu-notify.json` 控制，见下一节。
+
+所有字符串选项都支持 `${ENV_NAME}` 形式的环境变量引用，展开发生在插件加载时。
 
 `receiverType` 未填写时按 `receiverId` 推断：`oc_` 开头为 `chat_id`，`ou_` 为 `open_id`，`on_` 为 `union_id`，包含 `@` 为 `email`，其余为 `user_id`。
 
@@ -256,8 +298,8 @@ TUI 的开关是总开关：关闭后，无论 `feishu-notify.json` 中启用了
 
 ## 故障排查
 
-- 插件没有生效：在 `~/.local/share/opencode/log/opencode.log` 中搜索 `[feishu-notify]`。缺少必填项时会输出明确原因并停用插件。
-- 收不到消息：先运行 `bun run test-send`，排除飞书应用配置问题。
+- 插件没有生效：确认全局配置的 `plugins` 里有 `opencode-feishu-cards`，并且已经改成带 `options` 的对象条目；然后在 `~/.local/share/opencode/log/opencode.log` 中搜索 `[feishu-notify]`。缺少必填项时会输出明确原因并停用插件。
+- 收不到消息：先确认配置里的 `appId`、`appSecret`、`receiverId` 都已生效（`/feishu` 能看到插件版本），再到飞书开放平台的「发送消息」API 调试台，用同一套凭证发一条测试消息，排除应用配置问题。在仓库目录下可以运行 `bun run test-send` 做同样的检查。
 - `230013`：接收人不在应用可用范围内。
 - `230034`：`receiverId` 与 `receiverType` 不匹配。
 - `230002`、`230027`：机器人缺少发送消息权限，或不在群里。
