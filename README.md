@@ -360,12 +360,14 @@ TUI 的开关是总开关：关闭后，无论 `feishu-notify.json` 中启用了
    npm login --registry=https://registry.npmjs.org/
    npm publish --tag next --registry=https://registry.npmjs.org/
    # 用 opencode plugin add opencode-feishu-cards@next 验证安装后的包
-   npm publish --registry=https://registry.npmjs.org/
+   npm dist-tag add opencode-feishu-cards@<新版本> latest --registry=https://registry.npmjs.org/
    git tag v<新版本>
    git push --follow-tags
    ```
 
    不要跳过 `next` 预发布验证：`opencode plugin add` 不接受 tarball，只有真实发布后才能验证安装路径。
+
+   同一个版本只能发布一次。用 `next` 发布后，不要再执行 `npm publish`（它默认把版本挂到 `latest`，会报 `E409 Cannot publish over previously staged version`），而要用 `npm dist-tag add` 把 `latest` 指向已发布的版本。
 
 完整步骤与判断规则见 `.agents/skills/发布新版本.md`。
 
