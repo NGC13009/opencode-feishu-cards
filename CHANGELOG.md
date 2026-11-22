@@ -2,6 +2,10 @@
 
 本插件遵循 [语义化版本](https://semver.org/lang/zh-CN/)，版本号以 `package.json` 的 `version` 为唯一来源。
 
+## 1.0.2 - 2026-11-22
+
+- 文档：安装命令改为 `opencode plugin add opencode-feishu-cards`，不再锁定版本号，安装后可正常接收插件更新。
+
 ## 1.0.1 - 2026-11-22
 
 - 文档：重写安装流程，补充 npm 安装、全局配置位置、App ID 与 App Secret 的来源。

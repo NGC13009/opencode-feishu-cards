@@ -37,8 +37,10 @@
 
 ### 2. 安装插件
 
+执行命令：
+
 ```powershell
-opencode plugin add opencode-feishu-cards@1.0.0
+opencode plugin add opencode-feishu-cards
 ```
 
 这条命令会把插件安装到 OpenCode 的插件目录，并在全局配置 `~/.config/opencode/opencode.json(c)` 的 `plugins` 数组里追加一条条目。Windows 下这个文件通常是：
