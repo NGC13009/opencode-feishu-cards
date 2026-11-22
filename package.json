@@ -28,6 +28,14 @@
     "notification"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NGC13009/opencode-feishu-cards.git"
+  },
+  "homepage": "https://github.com/NGC13009/opencode-feishu-cards#readme",
+  "bugs": {
+    "url": "https://github.com/NGC13009/opencode-feishu-cards/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
