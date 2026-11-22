@@ -380,3 +380,11 @@ bun run test-send    # 用真实飞书应用发一条测试消息，需要已配
 ```
 
 测试覆盖配置解析、消息格式化、长内容分段与代码围栏补全、飞书客户端（含 token 缓存与失效重试）、通知状态读写、事件过滤、版本一致性，以及从 OpenCode 事件到飞书 HTTP 请求的完整链路。
+
+## 作者
+
+[NGC13009](https://github.com/NGC13009)
+
+[适用于 OpenCode 的简单飞书通知插件](https://github.com/NGC13009/opencode-feishu-cards.git)
+
+[协议：MIT](LICENSE)
